@@ -2,40 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
-use App\Models\teacherlist;
+use App\Http\Requests\TeacherFormRequest;
+use App\Models\TeacherList;
 use App\Models\user_role;
-use App\Http\Requests\teacherformRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
 
-
-class TeacherlistController extends Controller
+class TeacherListController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $teacherlist = teacherlist::query()
+        $teacherlist = TeacherList::query()
             ->paginate(5)
             ->appends(['sort' => 'department']);
-        return view('teacherList', compact('teacherlist'));
+
+        return view('teacher.teacher_list', compact('teacherlist'));
     }
 
     public function search(Request $request)
     {
         $search = trim((string) $request->query('search', ''));
 
-        $teachers = teacherlist::query()
+        $teachers = TeacherList::query()
             ->when($search !== '', function ($query) use ($search) {
                 return $query->where('name', 'like', "%{$search}%");
             })
             ->orderBy('name')
             ->get();
 
-        return view('partials.teacher-search-results', compact('teachers'));
+        return view('partials.teacher_search_results', compact('teachers'));
     }
 
     /**
@@ -49,11 +49,11 @@ class TeacherlistController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(teacherformRequest $request)
+    public function store(TeacherFormRequest $request)
     {
         $validated = $request->validated();
 
-        $teacherlist = new teacherlist();
+        $teacherlist = new TeacherList;
         $teacherlist->name = $validated['name'];
         $teacherlist->email = $validated['email'];
         $teacherlist->password = Hash::make($validated['password']);
@@ -69,27 +69,27 @@ class TeacherlistController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(teacherlist $teacherlist)
+    public function show(TeacherList $teacherlist)
     {
-        return view('teacherProfile', ['teacher' => $teacherlist]);
+        return view('teacher.teacher_profile', ['teacher' => $teacherlist]);
     }
 
-    public function classes(teacherlist $teacherlist): View
+    public function classes(TeacherList $teacherlist): View
     {
         $classes = $teacherlist->classes()
             ->withCount('students')
             ->orderBy('class_name')
             ->get();
 
-        return view('teacherClasses', compact('teacherlist', 'classes'));
+        return view('teacher.teacher_classes', compact('teacherlist', 'classes'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(teacherlist $teacherlist)
+    public function edit(TeacherList $teacherlist)
     {
-        return view('updateTeacherlist', [
+        return view('teacher.update_teacher_list', [
             'teacherlist' => $teacherlist,
             'profileEdit' => request()->routeIs('teacher.profile.edit'),
         ]);
@@ -98,7 +98,7 @@ class TeacherlistController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(teacherformRequest $request, teacherlist $teacherlist)
+    public function update(TeacherFormRequest $request, TeacherList $teacherlist)
     {
         $validated = $request->validated();
 
@@ -132,7 +132,7 @@ class TeacherlistController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(teacherlist $teacherlist)
+    public function destroy(TeacherList $teacherlist)
     {
         $teacherlist->delete();
 

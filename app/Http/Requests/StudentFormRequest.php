@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
-class studentformRequest extends FormRequest
+class StudentFormRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -33,7 +33,7 @@ class studentformRequest extends FormRequest
         if ($this->isMethod('put')) {
             return [
                 'username' => ['nullable', 'string', 'min:5', 'max:20'],
-                'email' => ['nullable', 'email', Rule::unique('studentlists', 'email')->ignore($this->route('student')->id)],
+                'email' => ['nullable', 'email', Rule::unique('student_lists', 'email')->ignore($this->route('student')->id)],
                 'password' => ['nullable', 'string', 'min:5', 'max:20', 'confirmed'],
                 'gender' => ['nullable', 'in:Male,Female,Other'],
                 'designation' => ['nullable', 'not_in:Not Selected'],
@@ -43,13 +43,14 @@ class studentformRequest extends FormRequest
 
         return [
             'username' => ['required', 'string', 'min:5', 'max:20'],
-            'email' => ['required', 'email', 'unique:studentlists,email'],
+            'email' => ['required', 'email', 'unique:student_lists,email'],
             'password' => ['required', 'string', 'min:5', 'max:20'],
             'gender' => ['required', 'in:Male,Female,Other'],
             'designation' => ['required', 'not_in:Not Selected'],
             'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,gif', 'max:20480'],
         ];
     }
+
     public function messages(): array
     {
         return [

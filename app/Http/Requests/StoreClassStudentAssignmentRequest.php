@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\StudentList;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Models\studentlist;
 
 class StoreClassStudentAssignmentRequest extends FormRequest
 {
@@ -25,7 +25,7 @@ class StoreClassStudentAssignmentRequest extends FormRequest
     {
         return [
             'student_ids' => ['required', 'array', 'min:1'],
-            'student_ids.*' => ['integer', 'distinct', Rule::exists(studentlist::class, 'id')],
+            'student_ids.*' => ['integer', 'distinct', Rule::exists(StudentList::class, 'id')],
         ];
     }
 }

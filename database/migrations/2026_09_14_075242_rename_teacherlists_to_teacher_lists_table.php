@@ -10,8 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
-        Schema::dropIfExists('test');
+        Schema::rename('teacherlists', 'teacher_lists');
     }
 
     /**
@@ -19,6 +18,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::rename('teacher_lists', 'teacherlists');
     }
 };

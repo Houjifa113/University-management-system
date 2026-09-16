@@ -2,8 +2,6 @@
 
 namespace App\Policies;
 
-use App\Models\teacherlist;
-
 class updatePolicy
 {
     /**

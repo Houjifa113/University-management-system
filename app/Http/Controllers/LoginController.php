@@ -50,6 +50,7 @@ class LoginController extends Controller
             'identifier' => 'The credentials do not match any records.',
         ])->onlyInput('identifier');
     }
+
     public function logout(Request $request): RedirectResponse
     {
         Auth::guard('admin')->logout();
@@ -91,5 +92,4 @@ class LoginController extends Controller
 
         return redirect()->route('login');
     }
-
 }

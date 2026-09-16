@@ -2,22 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\adminProfile;
+use App\Models\Admin;
 use App\Models\user_role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
-class AdminProfileController extends Controller
+class AdminController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('adminProfile', [
-            'adminProfile' => Auth::guard('admin')->user() ?? adminProfile::firstOrFail(),
+        return view('admin.admin_profile', [
+            'adminProfile' => Auth::guard('admin')->user() ?? Admin::firstOrFail(),
         ]);
     }
 
@@ -26,7 +26,7 @@ class AdminProfileController extends Controller
      */
     public function create()
     {
-        return view('adminSignup');
+        return view('admin.admin_signup');
     }
 
     /**
@@ -35,13 +35,13 @@ class AdminProfileController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'min:5', 'max:255', 'unique:admin,name'],
-            'email' => ['required', 'email', 'max:255', 'unique:admin,email'],
+            'name' => ['required', 'string', 'min:5', 'max:255', 'unique:admins,name'],
+            'email' => ['required', 'email', 'max:255', 'unique:admins,email'],
             'password' => ['required', 'string', 'min:5', 'max:20', 'confirmed'],
             'department' => ['required', 'string', 'max:255'],
         ]);
 
-        $adminProfile = new adminProfile;
+        $adminProfile = new Admin;
         $adminProfile->name = $validated['name'];
         $adminProfile->email = $validated['email'];
         $adminProfile->password = Hash::make($validated['password']);
@@ -56,15 +56,15 @@ class AdminProfileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(adminProfile $adminProfile) {}
+    public function show(Admin $adminProfile) {}
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit()
     {
-        return view('updateAdmin', [
-            'adminProfile' => Auth::guard('admin')->user() ?? adminProfile::firstOrFail(),
+        return view('admin.update_admin', [
+            'adminProfile' => Auth::guard('admin')->user() ?? Admin::firstOrFail(),
         ]);
     }
 
@@ -73,11 +73,11 @@ class AdminProfileController extends Controller
      */
     public function update(Request $request)
     {
-        $adminProfile = Auth::guard('admin')->user() ?? adminProfile::firstOrFail();
+        $adminProfile = Auth::guard('admin')->user() ?? Admin::firstOrFail();
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'min:5', 'max:255', Rule::unique('admin', 'name')->ignore($adminProfile)],
-            'email' => ['required', 'email', 'max:255', Rule::unique('admin', 'email')->ignore($adminProfile)],
+            'name' => ['required', 'string', 'min:5', 'max:255', Rule::unique('admins', 'name')->ignore($adminProfile)],
+            'email' => ['required', 'email', 'max:255', Rule::unique('admins', 'email')->ignore($adminProfile)],
             'password' => ['nullable', 'string', 'min:5', 'max:20', 'confirmed'],
             'department' => ['required', 'string', 'max:255'],
         ]);
@@ -95,4 +95,9 @@ class AdminProfileController extends Controller
         return redirect()->route('admin.profile')
             ->with('success', 'Profile updated successfully.');
     }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Admin $adminProfile) {}
 }

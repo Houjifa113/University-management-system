@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\teacherlist;
-use App\Models\adminProfile;
-use App\Models\studentlist;
+use App\Models\Admin;
+use App\Models\StudentList;
+use App\Models\TeacherList;
 
 return [
 
@@ -74,15 +74,15 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', teacherlist::class),
+            'model' => env('AUTH_MODEL', TeacherList::class),
         ],
         'admins' => [
             'driver' => 'eloquent',
-            'model' => adminProfile::class,
+            'model' => Admin::class,
         ],
         'students' => [
             'driver' => 'eloquent',
-            'model' => studentlist::class,
+            'model' => StudentList::class,
         ],
 
         // 'users' => [

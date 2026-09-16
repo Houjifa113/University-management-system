@@ -5,6 +5,105 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Add Student</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Global Dashboard Background */
+    body {
+      min-height: 100vh;
+      background-color: #0a192f !important;
+      background-image: linear-gradient(135deg, #0a192f 0%, #112240 50%, #1e3a8a 100%) !important;
+      background-attachment: fixed !important;
+      color: #e6f1ff !important;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Professional Glass Card */
+    .card {
+      padding: 2rem;
+      border: 1px solid rgb(100 255 218 / 10%) !important;
+      border-radius: 16px !important;
+      background: rgb(17 34 64 / 70%) !important;
+      box-shadow: 0 20px 40px rgb(2 12 27 / 70%) !important;
+      backdrop-filter: blur(12px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+    }
+
+    /* Inputs & Labels */
+    label {
+      display: block !important;
+      margin-bottom: 8px !important;
+      color: #64ffda !important;
+      font-weight: 600 !important;
+    }
+
+    input, select, textarea {
+      padding: 12px 16px !important;
+      border: 2px solid rgb(100 255 218 / 20%) !important;
+      border-radius: 8px !important;
+      background-color: rgb(2 12 27 / 60%) !important;
+      color: #fff !important;
+      transition: all 0.3s ease !important;
+    }
+
+    input:focus {
+      border-color: #64ffda !important;
+      box-shadow: 0 0 10px rgb(100 255 218 / 30%) !important;
+      outline: none;
+    }
+
+    /* Teal Action Buttons */
+    button, .btn {
+      padding: 14px 28px !important;
+      border: none !important;
+      border-radius: 8px !important;
+      background: linear-gradient(135deg, #64ffda 0%, #00bfa5 100%) !important;
+      box-shadow: 0 10px 15px -3px rgb(100 255 218 / 30%) !important;
+      color: #0a192f !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+    }
+
+    /* Gender Visibility & Alignment */
+    legend, .gender-label {
+      color: #00ffff !important;
+      font-size: 1.1rem !important;
+      font-weight: 800 !important;
+      text-shadow: 0 0 10px rgb(0 255 255 / 40%) !important;
+      text-transform: uppercase !important;
+    }
+
+    .gender-container {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      gap: 20px !important;
+    }
+
+    .form-check {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+    }
+
+    .form-check-input {
+      accent-color: #64ffda !important;
+      transform: scale(1.2) !important;
+    }
+
+    .form-check-label {
+      color: #fff !important;
+      font-weight: 600 !important;
+    }
+
+    @media (max-width: 576px) {
+      .btn {
+        width: 100% !important;
+        margin-bottom: 0.5rem !important;
+        text-align: center !important;
+      }
+    }
+  </style>
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
   <main class="container py-5 flex-grow-1">
@@ -61,7 +160,7 @@
 
             <fieldset class="col-12">
               <legend class="col-form-label pt-0 mb-2">Gender</legend>
-              <div class="d-flex flex-wrap gap-3">
+              <div class="gender-container">
                 @foreach (['Male', 'Female', 'Other'] as $gender)
                   <div class="form-check">
                     <input class="form-check-input @error('gender') is-invalid @enderror" type="radio" name="gender" value="{{ $gender }}" id="gender-{{ strtolower($gender) }}" @checked(old('gender') === $gender) required>

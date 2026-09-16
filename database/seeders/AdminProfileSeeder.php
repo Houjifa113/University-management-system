@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\adminProfile;
+use App\Models\Admin;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -10,7 +10,7 @@ class AdminProfileSeeder extends Seeder
 {
     public function run(): void
     {
-        adminProfile::updateOrCreate(
+        Admin::updateOrCreate(
             ['email' => 'admin@gmail.com'],
             [
                 'name' => 'admin1',

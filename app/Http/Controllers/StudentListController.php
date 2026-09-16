@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ImportStudentCsvRequest;
-use App\Http\Requests\studentformRequest;
-use App\Models\studentlist;
+use App\Http\Requests\StudentFormRequest;
+use App\Models\StudentList;
 use App\Models\user_role;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,24 +14,35 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
-class studentlistController extends Controller
+class StudentListController extends Controller
 {
-    public function addStudentlist(studentformRequest $request)
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
     {
-        $validated = $request->validated();
+        $studentlist = StudentList::query()
+            ->paginate(5)
+            ->appends(['sort' => 'department']);
 
-        $student = new studentlist;
-        $student->username = $validated['username'];
-        $student->email = $validated['email'];
-        $student->password = Hash::make($validated['password']);
-        $student->gender = $validated['gender'];
-        $student->department = $validated['designation'];
-        $student->image = $request->hasFile('image') ? $request->file('image')->store('images', 'public') : null;
-        $student->role_id = user_role::STUDENT_ID;
-        $student->save();
+        return view('student.student_list', [
+            'data' => $studentlist,
+            'studentlist' => $studentlist,
+        ]);
+    }
 
-        return redirect()->route('form')
-            ->with('success', 'Student added successfully');
+    public function search(Request $request)
+    {
+        $search = trim((string) $request->query('search', ''));
+
+        $students = StudentList::query()
+            ->when($search !== '', function ($query) use ($search) {
+                return $query->where('username', 'like', "%{$search}%");
+            })
+            ->orderBy('username')
+            ->get();
+
+        return view('partials.student_search_results', compact('students'));
     }
 
     public function import(ImportStudentCsvRequest $request): RedirectResponse
@@ -41,7 +52,7 @@ class studentlistController extends Controller
             foreach ($students as $studentData) {
                 $temporaryPassword = Str::password(12, letters: true, numbers: true, symbols: false);
 
-                $student = new studentlist;
+                $student = new StudentList;
                 $student->username = $studentData['username'];
                 $student->email = $studentData['email'];
                 $student->password = Hash::make($temporaryPassword);
@@ -57,7 +68,6 @@ class studentlistController extends Controller
             ->with('success', count($students).' students imported successfully. Each student can find their temporary password in their profile after signing in.');
     }
 
-
     public function export()
     {
         return response()->streamDownload(function (): void {
@@ -66,7 +76,7 @@ class studentlistController extends Controller
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($file, ['ID', 'Username', 'Email', 'Gender', 'Department', 'Role', 'Class ID', 'Role ID']);
 
-            DB::table('studentlists')
+            DB::table('student_lists')
                 ->select(['id', 'username', 'email', 'gender', 'department', 'role', 'class_id', 'role_id'])
                 ->orderBy('id')
                 ->eachById(function (object $student) use ($file): void {
@@ -85,103 +95,110 @@ class studentlistController extends Controller
             fclose($file);
         }, 'students_report_'.now()->format('Y-m-d').'.csv', [
             'Content-Type' => 'text/csv; charset=UTF-8',
-            ]);
+        ]);
     }
 
-
-    public function showStudentlist()
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
     {
-        $studentlist = DB::table('studentlists')
-            ->orderBy('id')
-            ->paginate(5)
-            ->appends(['sort' => 'department']);
-
-        return view('studentList', ['data' => $studentlist]);
-
+        //
     }
 
-    public function search(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StudentFormRequest $request)
     {
-        $search = trim((string) $request->query('search', ''));
+        $validated = $request->validated();
 
-        $students = studentlist::query()
-            ->when($search !== '', function ($query) use ($search) {
-                return $query->where('username', 'like', "%{$search}%");
-            })
-            ->orderBy('username')
-            ->get();
+        $student = new StudentList;
+        $student->username = $validated['username'];
+        $student->email = $validated['email'];
+        $student->password = Hash::make($validated['password']);
+        $student->gender = $validated['gender'];
+        $student->department = $validated['designation'];
+        $student->role_id = user_role::STUDENT_ID;
+        $student->image = $request->hasFile('image') ? $request->file('image')->store('images', 'public') : null;
+        $student->save();
 
-        return view('partials.student-search-results', compact('students'));
+        return redirect()->route('form')
+            ->with('success', 'Student added successfully');
     }
 
-    public function showStudentProfile(studentlist $student)
+    /**
+     * Display the specified resource.
+     */
+    public function show(StudentList $student)
     {
-        return view('studentProfile', ['student' => $student]);
+        return view('student.student_profile', ['student' => $student]);
     }
 
-    public function classes(studentlist $student): View
+    public function classes(StudentList $student): View
     {
         $classes = $student->classes()
             ->with('teacher')
             ->orderBy('class_name')
             ->get();
 
-        return view('studentClasses', compact('student', 'classes'));
+        return view('student.student_classes', compact('student', 'classes'));
     }
 
-    public function deleteStudentlist(studentlist $student)
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(StudentList $student)
     {
-        $student->delete();
-
-        return redirect()->route('studentlist');
+        return view('student.update_student_list', ['studentlist' => $student]);
     }
 
-    public function showUpdateStudentlist(studentlist $student)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(StudentFormRequest $request, StudentList $student)
     {
-        return view('updateStudentlist', ['studentlist' => $student]);
-    }
-
-    public function updateStudentlist(studentformRequest $request, studentlist $student)
-    {
-        $id = $student->id;
         $validated = $request->validated();
 
-        if (Auth::guard('student')->check()) {
-            $student = [];
-        } else {
-            $student = [];
+        if (! Auth::guard('student')->check()) {
             foreach (['username', 'email', 'gender'] as $field) {
                 if (! empty($validated[$field])) {
-                    $student[$field] = $validated[$field];
+                    $student->{$field} = $validated[$field];
                 }
             }
 
             if (! empty($validated['designation'])) {
-                $student['department'] = $validated['designation'];
+                $student->department = $validated['designation'];
             }
         }
 
         if ($validated['password'] ?? false) {
-            $student['password'] = Hash::make($validated['password']);
-            $student['temporary_password'] = null;
+            $student->password = Hash::make($validated['password']);
+            $student->temporary_password = null;
         }
 
         if ($request->hasFile('image')) {
-            $student['image'] = $request->file('image')->store('images', 'public');
+            $student->image = $request->file('image')->store('images', 'public');
         }
 
-        if ($student !== []) {
-            DB::table('studentlists')
-                ->where('id', $id)
-                ->update($student);
-        }
+        $student->save();
 
         if (Auth::guard('student')->check()) {
-            return redirect()->route('student.profile', $id)
+            return redirect()->route('student.profile', $student)
                 ->with('success', 'Your profile was updated successfully.');
         }
 
         return redirect()->route('studentlist')
             ->with('success', 'Student information updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(StudentList $student)
+    {
+        $student->delete();
+
+        return redirect()->route('studentlist');
     }
 }

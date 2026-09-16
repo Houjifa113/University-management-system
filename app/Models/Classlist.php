@@ -18,12 +18,12 @@ class Classlist extends Model
 
     public function teacher(): BelongsTo
     {
-        return $this->belongsTo(teacherlist::class, 'teacher_id');
+        return $this->belongsTo(TeacherList::class, 'teacher_id');
     }
 
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(studentlist::class, 'class_student', 'class_id', 'student_id')
+        return $this->belongsToMany(StudentList::class, 'class_student', 'class_id', 'student_id')
             ->withTimestamps();
     }
 }

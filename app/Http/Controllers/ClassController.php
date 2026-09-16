@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreClassRequest;
 use App\Http\Requests\StoreClassStudentAssignmentRequest;
 use App\Models\Classlist;
-use App\Models\studentlist;
-use App\Models\teacherlist;
+use App\Models\StudentList;
+use App\Models\TeacherList;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -24,7 +24,7 @@ class ClassController extends Controller
             ->orderBy('class_name')
             ->get();
 
-        return view('classList', compact('classes'));
+        return view('class.class_list', compact('classes'));
     }
 
     /**
@@ -32,22 +32,22 @@ class ClassController extends Controller
      */
     public function create()
     {
-        $teacher = teacherlist::find(session('class_teacher_id'));
-        $students = studentlist::whereIn('id', session('class_student_ids', []))->get();
+        $teacher = TeacherList::find(session('class_teacher_id'));
+        $students = StudentList::whereIn('id', session('class_student_ids', []))->get();
 
-        return view('createClass', compact('teacher', 'students'));
+        return view('class.create_class', compact('teacher', 'students'));
     }
 
     public function assignTeacher()
     {
-        $teachers = teacherlist::query()
+        $teachers = TeacherList::query()
             ->orderBy('name')
             ->get();
 
-        return view('assignTeacher', compact('teachers'));
+        return view('class.assign_teacher', compact('teachers'));
     }
 
-    public function storeTeacherAssignment(teacherlist $teacher)
+    public function storeTeacherAssignment(TeacherList $teacher)
     {
         session(['class_teacher_id' => $teacher->id]);
 
@@ -57,13 +57,13 @@ class ClassController extends Controller
 
     public function assignStudent()
     {
-        $students = studentlist::query()
+        $students = StudentList::query()
             ->orderBy('username')
             ->get();
 
         $selectedStudentIds = session('class_student_ids', []);
 
-        return view('assignStudent', compact('students', 'selectedStudentIds'));
+        return view('student.assign_student', compact('students', 'selectedStudentIds'));
     }
 
     public function storeStudentAssignment(StoreClassStudentAssignmentRequest $request)
@@ -81,7 +81,7 @@ class ClassController extends Controller
      */
     public function store(StoreClassRequest $request): RedirectResponse
     {
-        $teacher = teacherlist::find(session('class_teacher_id'));
+        $teacher = TeacherList::find(session('class_teacher_id'));
         $studentIds = session('class_student_ids', []);
 
         if (! $teacher) {
@@ -117,7 +117,7 @@ class ClassController extends Controller
     {
         $classlist->load(['teacher', 'students']);
 
-        return view('classDetails', compact('classlist'));
+        return view('class.class_details', compact('classlist'));
     }
 
     /**

@@ -88,7 +88,7 @@ class ImportStudentCsvRequest extends FormRequest
 
             $validator = Validator::make($studentData, [
                 'username' => ['required', 'string', 'min:5', 'max:20'],
-                'email' => ['required', 'email', Rule::unique('studentlists', 'email')],
+                'email' => ['required', 'email', Rule::unique('student_lists', 'email')],
                 'gender' => ['required', 'in:Male,Female,Other'],
                 'department' => ['required', 'in:SWE,BA,PM'],
             ]);

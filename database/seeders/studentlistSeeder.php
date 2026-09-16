@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\StudentList;
 use Illuminate\Database\Seeder;
-use App\Models\studentlist;
 
 class studentlistSeeder extends Seeder
 {
@@ -13,12 +12,12 @@ class studentlistSeeder extends Seeder
      */
     public function run(): void
     {
-      // studentlist::create([
-      //   'username'=>'Rahib',
-      //   'email'=>'rahib@gmail.com',
-      //   'password'=>'rahib123',
-      //   'gender'=>'male',
-      //   'department'=>'swe'
-      // ]);
+        // StudentList::create([
+        //   'username'=>'Rahib',
+        //   'email'=>'rahib@gmail.com',
+        //   'password'=>'rahib123',
+        //   'gender'=>'male',
+        //   'department'=>'swe'
+        // ]);
     }
 }

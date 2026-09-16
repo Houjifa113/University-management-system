@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class teacherformRequest extends FormRequest
+class TeacherFormRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -32,13 +32,13 @@ class teacherformRequest extends FormRequest
                 'string',
                 'min:5',
                 'max:255',
-                Rule::unique('teacherlists', 'name')->ignore($teacher),
+                Rule::unique('teacher_lists', 'name')->ignore($teacher),
             ],
             'email' => [
                 $isCreatingTeacher ? 'required' : 'nullable',
                 'email',
                 'max:255',
-                Rule::unique('teacherlists', 'email')->ignore($teacher),
+                Rule::unique('teacher_lists', 'email')->ignore($teacher),
             ],
             'password' => [$isCreatingTeacher ? 'required' : 'nullable', 'string', 'min:5', 'max:20', 'confirmed'],
             'department' => [$isCreatingTeacher ? 'required' : 'nullable', 'string', 'max:255'],

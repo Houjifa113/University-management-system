@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('password', 100);
             $table->string('gender');
             $table->string('department');
-           
+
         });
     }
 
